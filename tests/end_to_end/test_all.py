@@ -1,15 +1,8 @@
-def test_push_main_branch(gh_repo, git, gh_me):
-    sha1 = git("rev-parse", "HEAD")  # Could be a fixture
-    while True:
-        run = gh_me(
-            "gh", "run", "list", "-b", "v2", "-L", "1", "--json", "databaseId,headSha"
-        )
-        if run and run[0]["headSha"] == sha1:
-            break
+def test_push_main_branch(gh_repo, wait_for_run_to_start, head_sha1, git, gh_me):
 
-    id = run[0]["databaseId"]
+    run_id = wait_for_run_to_start(sha1=head_sha1(), branch="main", gh=gh_me)
 
-    gh_me("gh", "run", "watch", f"{id}")
+    print(gh_me("run", "watch", f"{run_id}", "--exit-status"))
 
     # Check the coverage badge. Maybe even extract its exact URL from the watch
     # command above.
